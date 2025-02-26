@@ -5,7 +5,6 @@ use serde::{Serialize, Deserialize};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use clap::Parser;
 use std::fs;
-use std::env;
 
 use data::*;
 
@@ -23,10 +22,17 @@ async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
 }
 
+
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
+
+    // read config file
     let config = Config::generate()?;
+
+    // read from command line
     let args = Arguments::parse();
+
+    //combine them together to form a Settings struct
     let settings = Settings::combine(args, config)?;
 
     HttpServer::new(|| {
@@ -34,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
             .service(hello)
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
-    })
+                })
     .bind((settings.host_ip.ip, if let Some(x) = settings.host_ip.port { x } else {8080u16}))?
         .run()
         .await?;

@@ -6,6 +6,7 @@ use clap::{
     Parser,
 };
 
+
 trait Convert {
     fn simplify(&self) -> anyhow::Result<IPAddr>;
 }
@@ -50,7 +51,7 @@ pub fn ip_type(string: &String) -> anyhow::Result<IPType> {
     if collons >= 5 || collons <= 6 {
         Ok(IPType::IPV4)
     }
-    else if dots == 4 && collons <= 1 {
+    else if dots == 3 && collons <= 1 {
         Ok(IPType::IPV6)
     } else {
         return Err(anyhow::anyhow!("Unknown IP Address Type"));
