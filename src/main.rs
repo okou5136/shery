@@ -2,7 +2,12 @@ mod data;
 
 use anyhow::Context;
 use serde::{Serialize, Deserialize};
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, web, App, HttpResponse, HttpRequest, HttpServer, Responder, middleware::Logger,
+http::{
+    header::{self, ContentType},
+    Method, StatusCode
+}
+};
 use clap::Parser;
 use std::fs;
 
@@ -22,7 +27,6 @@ async fn manual_hello() -> impl Responder {
     HttpResponse::Ok().body("Hey there!")
 }
 
-
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
 
@@ -37,8 +41,7 @@ async fn main() -> anyhow::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .service(hello)
-            .service(echo)
+            .service(Files::)
             .route("/hey", web::get().to(manual_hello))
                 })
     .bind((settings.host_ip.ip, if let Some(x) = settings.host_ip.port { x } else {8080u16}))?
